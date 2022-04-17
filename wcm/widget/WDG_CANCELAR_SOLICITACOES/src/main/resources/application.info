@@ -1,0 +1,17 @@
+application.type=widget
+application.code=WDG_CANCELAR_SOLICITACOES
+application.title=Cancelar solicitações
+application.description=Cancelar solicitações
+application.category=SYSTEM
+application.renderer=freemarker
+developer.code=pedro.costa.neto@outlook.com.br
+developer.name=Pedro Costa
+developer.url=https://github.com/pedro-costa-neto
+application.uiwidget=true
+application.mobileapp=true
+application.version=${build.version}-${build.revision}
+view.file=view.ftl
+edit.file=edit.ftl
+locale.file.base.name=WDG_CANCELAR_SOLICITACOES
+application.resource.js.1=/resources/js/WDG_CANCELAR_SOLICITACOES.js
+application.resource.css.2=/resources/css/WDG_CANCELAR_SOLICITACOES.css
