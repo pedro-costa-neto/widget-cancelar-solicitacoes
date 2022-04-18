@@ -45,6 +45,7 @@
 
         <div class="col-md-12 form-group">
             <button type="button" class="btn btn-success" style="float: right;" data-adicionar-processo>Adicionar</button>
+            <button type="button" class="btn btn-danger" style="float: right;" data-cancelar-solicitacoes>Cancelar solicitações</button>
         </div>
 
     </div>

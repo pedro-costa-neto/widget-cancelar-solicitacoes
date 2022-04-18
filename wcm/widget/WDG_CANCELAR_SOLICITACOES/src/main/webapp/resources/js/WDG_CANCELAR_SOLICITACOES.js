@@ -3,7 +3,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     
     bindings: {
         local: {
-            'adicionar-processo': ['click_fnAdicionarProcesso']
+            'adicionar-processo': ['click_fnAdicionarProcesso'],
+            'cancelar-solicitacoes': ['click_fnConsultarCancelarSolicitacoes']
         },
         global: {}
     },
@@ -126,8 +127,78 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         return resultado;
     },
 
+    fnConsultarCancelarSolicitacoes(htmlElement, event) {
+        const that = this;
+        const processos = this.LISTA_PROCESSO;
+
+        for(let processo of processos) {
+            const constraints = [];
+
+            constraints.push(
+                DatasetFactory.createConstraint(
+                    "processId", 
+                    processo.processoCodigo, 
+                    processo.processoCodigo, 
+                    ConstraintType.MUST
+                )
+            );
+
+
+            constraints.push(
+                DatasetFactory.createConstraint(
+                    "workflowProcessPK.processInstanceId", 
+                    processo.solicitacaoInicio, 
+                    processo.solicitacaoFim, 
+                    ConstraintType.MUST
+                )
+            );
+
+            constraints.push(
+                DatasetFactory.createConstraint(
+                    "startDateProcess", 
+                    processo.dataInicio, 
+                    processo.dataFim, 
+                    ConstraintType.MUST
+                )
+            );
+
+            // Filtrar todas as solicitações que não estão canceladas ou finalizadas
+            constraints.push(
+                DatasetFactory.createConstraint(
+                    "active", 
+                    "true", 
+                    "true", 
+                    ConstraintType.MUST
+                )
+            );
+
+            const fields = [
+                "requesterId",
+                "workflowProcessPK.processInstanceId"
+            ];
+
+            DatasetFactory.getDataset("workflowProcess", fields, constraints, null, {
+                success: function(data) {
+                    if(data != undefined && data != null) that.fnCancelarSolicitacoes(data.values);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR, textStatus, errorThrown);
+                }
+            });
+        }
+    },
+
     fnCancelarSolicitacoes(registros) {
+        const cancelInstanceList = registros.map((item) => {
+            return {
+                processInstanceId: item["workflowProcessPK.processInstanceId"],
+                replacedId: item["requesterId"],
+                cancelText: "Cancelado automaticamente \"WDG CANCELAR SOLICITAÇÕES\""
+            }
+        });
         
+        console.log(cancelInstanceList);
+
         // {
         //     cancelInstanceList: [ 
         //         {
@@ -137,6 +208,11 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         //         }
         //     ]
         // }
+    },
+
+    fnConverterData(data) {
+        let aux = data.split("/");
+        return `${aux[2]}-${aux[1]}-${aux[0]}`;
     },
 
     isEmpty: function(value) {
