@@ -44,8 +44,10 @@
     <div class="row">
 
         <div class="col-md-12 form-group">
-            <button type="button" class="btn btn-success" style="float: right;" data-adicionar-processo>Adicionar</button>
-            <button type="button" class="btn btn-danger" style="float: right;" data-cancelar-solicitacoes>Cancelar solicitações</button>
+            <button type="button" class="btn btn-success" style="float: right;" data-adicionar-processo>Salvar</button>
+            <button type="button" class="btn btn-info" id="btn_editar_${instanceId}" data-editar-registro>Editar</button>
+            <button type="button" class="btn btn-warning" id="btn_excluir_${instanceId}" data-excluir-registros>Excluir</button>
+            <button type="button" class="btn btn-danger" id="btn_cancelar_${instanceId}" data-cancelar-solicitacoes>Cancelar solicitações</button>
         </div>
 
     </div>
