@@ -15,14 +15,14 @@
             <label for="solicitacaoInicio_${instanceId}">
                 <strong>Solicitação início</strong>
             </label>
-            <input type="number" class="form-control" id="solicitacaoInicio_${instanceId}" min="0">		
+            <input type="number" class="form-control" id="solicitacaoInicio_${instanceId}" min="0" max="999999999" maxlength="9" value="0">		
         </div>
         
         <div class="col-md-2 form-group">
             <label for="solicitacaoFim_${instanceId}">
                 <strong>Solicitação fim</strong>
             </label>
-            <input type="number" class="form-control" id="solicitacaoFim_${instanceId}" min="0">		
+            <input type="number" class="form-control" id="solicitacaoFim_${instanceId}" min="0" max="999999999" maxlength="9" value="999999999">		
         </div>
         
         <div class="col-md-2 form-group">
