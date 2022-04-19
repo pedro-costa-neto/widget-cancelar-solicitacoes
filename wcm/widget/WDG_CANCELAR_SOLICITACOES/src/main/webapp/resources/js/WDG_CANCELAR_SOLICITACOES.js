@@ -179,7 +179,9 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
 
             DatasetFactory.getDataset("workflowProcess", fields, constraints, null, {
                 success: function(data) {
-                    if(data != undefined && data != null) that.fnCancelarSolicitacoes(data.values);
+                    if(that.isNotEmpty(data)) {
+                        that.fnCancelarSolicitacoes(data.values, processo.processoDescricao);
+                    }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR, textStatus, errorThrown);
@@ -188,7 +190,9 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         }
     },
 
-    fnCancelarSolicitacoes(registros) {
+    fnCancelarSolicitacoes(registros, processoDescricao) {
+        if(this.isEmpty(registros)) return;
+
         const cancelInstanceList = registros.map((item) => {
             return {
                 processInstanceId: item["workflowProcessPK.processInstanceId"],
@@ -197,26 +201,35 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
             }
         });
         
-        console.log(cancelInstanceList);
+        const dados = {
+            cancelInstanceList: cancelInstanceList
+        }
 
-        // {
-        //     cancelInstanceList: [ 
-        //         {
-        //             processInstanceId: 1, //Process instance id 
-        //             cancelText: "Canceled as a replacement", //Cancel text 
-        //             replacedId: "usr" //User id from the replaced cancel process instance
-        //         }
-        //     ]
-        // }
-    },
-
-    fnConverterData(data) {
-        let aux = data.split("/");
-        return `${aux[2]}-${aux[1]}-${aux[0]}`;
+        WCMAPI.Read({
+    		type: "POST",
+    		async: true,
+    		url: '/api/public/2.0/workflows/cancelInstances',
+    	    contentType: "application/json",
+    	    dataType: "json",
+    	    data: JSON.stringify(dados),
+    	    success: function(data) {
+                console.log(data);
+    	    	alert("dados criados com sucesso");
+                FLUIGC.toast({
+                    title: 'Sucesso',
+                    message: `As solicitações do processo "${processoDescricao}" foram canceladas!`,
+                    type: 'success'
+                });
+    	    }
+    	});
     },
 
     isEmpty: function(value) {
         return value == undefined || value == null || value == "";
+    },
+
+    isNotEmpty(value) {
+        return !this.isEmpty(value);
     }
 
 });
