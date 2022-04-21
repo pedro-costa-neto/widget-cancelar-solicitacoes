@@ -24,6 +24,12 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
             }));
         }
         
+        const registros = localStorage.getItem("TABELA_PROCESSOS");
+
+        if(this.isNotEmpty(registros)) {
+            this.LISTA_PROCESSO = JSON.parse(registros);
+        }
+        
         this.fnCarregarTabelaProcessos(this.LISTA_PROCESSO);
     },
 
@@ -49,8 +55,6 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
                 enabled: false,
             }
         });
-
-        this.LISTA_PROCESSO = this.TABELA_PROCESSOS.getData();
     },
 
     fnAdicionarProcesso: function(htmlElement, event) {
@@ -84,7 +88,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         }
         
         this.TABELA_PROCESSOS.reload();
-        this.LISTA_PROCESSO = this.TABELA_PROCESSOS.getData();
+        
+        this.fnGravarLocal();
 
         $(`#editar_indice_${this.instanceId}`).val("");
         $(`#processo_${this.instanceId}`).val("");
@@ -245,6 +250,7 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     fnExcluirRegistros: function(htmlElement, event) {
         const linhasSelecionadas = this.TABELA_PROCESSOS.selectedRows();
         this.TABELA_PROCESSOS.removeRows(linhasSelecionadas);
+        this.fnGravarLocal();
     },
 
     fnEditarRegistro: function() {
@@ -269,6 +275,12 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         $(`#solicitacaoFim_${this.instanceId}`).val(linha.solicitacaoFim);
         $(`#dataInicio_${this.instanceId}`).val(linha.dataInicio);
         $(`#dataFim_${this.instanceId}`).val(linha.dataFim);
+    },
+
+    fnGravarLocal: function() {
+        this.LISTA_PROCESSO = this.TABELA_PROCESSOS.getData();
+        const conteudo = JSON.stringify(this.LISTA_PROCESSO);
+        localStorage.setItem("TABELA_PROCESSOS", conteudo);
     },
 
     isEmpty: function(value) {
