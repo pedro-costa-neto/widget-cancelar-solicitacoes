@@ -4,7 +4,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     bindings: {
         local: {
             'adicionar-processo': ['click_fnAdicionarProcesso'],
-            'cancelar-solicitacoes': ['click_fnConsultarCancelarSolicitacoes']
+            'cancelar-solicitacoes': ['click_fnConsultarCancelarSolicitacoes'],
+            'excluir-registros': ['click_fnExcluirRegistros']
         },
         global: {}
     },
@@ -31,6 +32,7 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
             classSelected: 'info',
             tableStyle: 'table-condensed table-hover',
             dataRequest: registros,
+            multiSelect: true,
             header: [
                 { 'title': 'Código' },
                 { 'title': 'Descrição' },
@@ -222,6 +224,11 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
                 });
     	    }
     	});
+    },
+
+    fnExcluirRegistros: function(htmlElement, event) {
+        const linhasSelecionadas = this.TABELA_PROCESSOS.selectedRows();
+        this.TABELA_PROCESSOS.removeRows(linhasSelecionadas);
     },
 
     isEmpty: function(value) {
