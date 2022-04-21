@@ -5,7 +5,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         local: {
             'adicionar-processo': ['click_fnAdicionarProcesso'],
             'cancelar-solicitacoes': ['click_fnConsultarCancelarSolicitacoes'],
-            'excluir-registros': ['click_fnExcluirRegistros']
+            'excluir-registros': ['click_fnExcluirRegistros'],
+            'editar-registro': ['click_fnEditarRegistro']
         },
         global: {}
     },
@@ -55,6 +56,7 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     fnAdicionarProcesso: function(htmlElement, event) {
         if(this.fnValidarCampos()) return;
 
+        const editarProcesso = $(`#editar_indice_${this.instanceId}`).val();
         const processoCodigo = $(`#processo_${this.instanceId}`).val();
         const processoDescricao = $(`#processo_${this.instanceId} :selected`).text();
         const solicitacaoInicio = $(`#solicitacaoInicio_${this.instanceId}`).val();
@@ -62,20 +64,34 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         const dataInicio = $(`#dataInicio_${this.instanceId}`).val();
         const dataFim = $(`#dataFim_${this.instanceId}`).val();
 
-        if(this.fnExisteProcessoNaTabela(processoCodigo)) return;
+        if(this.fnExisteProcessoNaTabela(processoCodigo) && this.isEmpty(editarProcesso)) return;
 
-        const indice = this.LISTA_PROCESSO.length;
-        this.TABELA_PROCESSOS.addRow(indice, {
+        const indice = this.isEmpty(editarProcesso) ? this.LISTA_PROCESSO.length : parseInt(editarProcesso);
+        const registro = {
             processoCodigo : processoCodigo,
             processoDescricao : processoDescricao,
             solicitacaoInicio : solicitacaoInicio,
             solicitacaoFim : solicitacaoFim,
             dataInicio : dataInicio,
             dataFim : dataFim
-        });
+        };
 
+        if(this.isEmpty(editarProcesso)) {
+            this.TABELA_PROCESSOS.addRow(indice, registro);
+        }
+        else {
+            this.TABELA_PROCESSOS.updateRow(indice, registro);
+        }
+        
         this.TABELA_PROCESSOS.reload();
         this.LISTA_PROCESSO = this.TABELA_PROCESSOS.getData();
+
+        $(`#editar_indice_${this.instanceId}`).val("");
+        $(`#processo_${this.instanceId}`).val("");
+        $(`#solicitacaoInicio_${this.instanceId}`).val("0");
+        $(`#solicitacaoFim_${this.instanceId}`).val("999999999");
+        $(`#dataInicio_${this.instanceId}`).val("");
+        $(`#dataFim_${this.instanceId}`).val("");
     },
 
     fnExisteProcessoNaTabela: function(processoCodigo) {
@@ -229,6 +245,30 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     fnExcluirRegistros: function(htmlElement, event) {
         const linhasSelecionadas = this.TABELA_PROCESSOS.selectedRows();
         this.TABELA_PROCESSOS.removeRows(linhasSelecionadas);
+    },
+
+    fnEditarRegistro: function() {
+        const linhasSelecionadas = this.TABELA_PROCESSOS.selectedRows();
+
+        if(linhasSelecionadas.length == 0 || linhasSelecionadas.length > 1) {
+            FLUIGC.toast({
+                title: 'Alerta: ',
+                message: `Por favor, selecionar apenas um registro para edição!`,
+                type: 'warning'
+            });
+
+            return;
+        }
+
+        const indice = linhasSelecionadas[0];
+        const linha = this.TABELA_PROCESSOS.getRow(indice);
+
+        $(`#editar_indice_${this.instanceId}`).val(indice);
+        $(`#processo_${this.instanceId}`).val(linha.processoCodigo);
+        $(`#solicitacaoInicio_${this.instanceId}`).val(linha.solicitacaoInicio);
+        $(`#solicitacaoFim_${this.instanceId}`).val(linha.solicitacaoFim);
+        $(`#dataInicio_${this.instanceId}`).val(linha.dataInicio);
+        $(`#dataFim_${this.instanceId}`).val(linha.dataFim);
     },
 
     isEmpty: function(value) {

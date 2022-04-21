@@ -1,11 +1,12 @@
 <div id="WDG_CANCELAR_SOLICITACOES_${instanceId}" class="super-widget wcm-widget-class fluig-style-guide" data-params="WDG_CANCELAR_SOLICITACOES.instance()">
 
     <div class="row">
-        
+
         <div class="col-md-4 form-group">
             <label for="processo_${instanceId}">
                 <strong>Processo</strong>
             </label>
+            <input type="hidden" id="editar_indice_${instanceId}" >
             <select class="form-control" id="processo_${instanceId}">
                 <option value="">Selecionar</option>
             </select>		
