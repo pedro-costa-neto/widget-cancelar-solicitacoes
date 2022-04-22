@@ -31,6 +31,7 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         }
         
         this.fnCarregarTabelaProcessos(this.LISTA_PROCESSO);
+        this.fnAtivarOuDesativarAcoes();
     },
 
     fnCarregarTabelaProcessos: function(registros) {
@@ -236,8 +237,6 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     	    dataType: "json",
     	    data: JSON.stringify(dados),
     	    success: function(data) {
-                console.log(data);
-    	    	alert("dados criados com sucesso");
                 FLUIGC.toast({
                     title: 'Sucesso',
                     message: `As solicitações do processo "${processoDescricao}" foram canceladas!`,
@@ -281,6 +280,21 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         this.LISTA_PROCESSO = this.TABELA_PROCESSOS.getData();
         const conteudo = JSON.stringify(this.LISTA_PROCESSO);
         localStorage.setItem("TABELA_PROCESSOS", conteudo);
+
+        this.fnAtivarOuDesativarAcoes();
+    },
+
+    fnAtivarOuDesativarAcoes() {
+        if(this.LISTA_PROCESSO.length > 0) {
+            $(`#btn_editar_${this.instanceId}`).show();
+            $(`#btn_excluir_${this.instanceId}`).show();
+            $(`#btn_cancelar_${this.instanceId}`).show();
+        }
+        else {
+            $(`#btn_editar_${this.instanceId}`).hide();
+            $(`#btn_excluir_${this.instanceId}`).hide();
+            $(`#btn_cancelar_${this.instanceId}`).hide();
+        }
     },
 
     isEmpty: function(value) {
