@@ -1,5 +1,6 @@
 var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     LISTA_PROCESSO: [],
+    LOADING: FLUIGC.loading(window),
     
     bindings: {
         local: {
@@ -218,6 +219,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     fnCancelarSolicitacoes(registros) {
         if(this.isEmpty(registros)) return;
 
+        this.LOADING.show();
+
         const that = this;
         const cancelInstanceList = registros.map((item) => {
             return {
@@ -260,6 +263,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         historico = JSON.stringify(historico);
         localStorage.setItem("PROCESSO_RELATORIO", historico);
         that.fnAtivarOuDesativarRelatorio();
+
+        WDG_CANCELAR_SOLICITACOES.LOADING.hide();
     },
 
     fnBaixarRelatorio: function(htmlElement, event) {
