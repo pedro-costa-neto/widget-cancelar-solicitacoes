@@ -49,6 +49,7 @@
             <button type="button" class="btn btn-info" id="btn_editar_${instanceId}" data-editar-registro>Editar</button>
             <button type="button" class="btn btn-warning" id="btn_excluir_${instanceId}" data-excluir-registros>Excluir</button>
             <button type="button" class="btn btn-danger" id="btn_cancelar_${instanceId}" data-cancelar-solicitacoes>Cancelar solicitações</button>
+            <button type="button" class="btn btn-primary" id="btn_baixar_relatorio_${instanceId}" data-baixar-relatorio>Baixar relatório</button>
         </div>
 
     </div>

@@ -13,5 +13,6 @@ application.version=${build.version}-${build.revision}
 view.file=view.ftl
 edit.file=edit.ftl
 locale.file.base.name=WDG_CANCELAR_SOLICITACOES
-application.resource.js.1=/resources/js/WDG_CANCELAR_SOLICITACOES.js
+application.resource.js.1=/resources/js/PUBCORE_DOWNLOAD_XLSX.js
+application.resource.js.2=/resources/js/WDG_CANCELAR_SOLICITACOES.js
 application.resource.css.2=/resources/css/WDG_CANCELAR_SOLICITACOES.css

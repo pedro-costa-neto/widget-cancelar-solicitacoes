@@ -6,7 +6,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
             'adicionar-processo': ['click_fnAdicionarProcesso'],
             'cancelar-solicitacoes': ['click_fnConsultarCancelarSolicitacoes'],
             'excluir-registros': ['click_fnExcluirRegistros'],
-            'editar-registro': ['click_fnEditarRegistro']
+            'editar-registro': ['click_fnEditarRegistro'],
+            'baixar-relatorio': ['click_fnBaixarRelatorio']
         },
         global: {}
     },
@@ -32,6 +33,7 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         
         this.fnCarregarTabelaProcessos(this.LISTA_PROCESSO);
         this.fnAtivarOuDesativarAcoes();
+        this.fnAtivarOuDesativarRelatorio();
     },
 
     fnCarregarTabelaProcessos: function(registros) {
@@ -203,9 +205,8 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
 
             DatasetFactory.getDataset("workflowProcess", fields, constraints, null, {
                 success: function(data) {
-                    if(that.isNotEmpty(data)) {
-                        that.fnCancelarSolicitacoes(data.values, processo.processoDescricao);
-                    }
+                    if(that.isEmpty(data)) return;
+                    that.fnCancelarSolicitacoes(data.values);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.log(jqXHR, textStatus, errorThrown);
@@ -214,9 +215,10 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
         }
     },
 
-    fnCancelarSolicitacoes(registros, processoDescricao) {
+    fnCancelarSolicitacoes(registros) {
         if(this.isEmpty(registros)) return;
 
+        const that = this;
         const cancelInstanceList = registros.map((item) => {
             return {
                 processInstanceId: item["workflowProcessPK.processInstanceId"],
@@ -236,14 +238,84 @@ var WDG_CANCELAR_SOLICITACOES = SuperWidget.extend({
     	    contentType: "application/json",
     	    dataType: "json",
     	    data: JSON.stringify(dados),
-    	    success: function(data) {
-                FLUIGC.toast({
-                    title: 'Sucesso',
-                    message: `As solicitações do processo "${processoDescricao}" foram canceladas!`,
-                    type: 'success'
-                });
-    	    }
+    	    success: that.fnSalvarRelatorio
     	});
+    },
+
+    fnSalvarRelatorio: function(dados) {
+        const that = WDG_CANCELAR_SOLICITACOES;
+        if(that.isEmpty(dados) && that.isEmpty(dados.content)) return;
+
+        const registros = dados.content.cancelInstanceResults;
+        let historico = localStorage.getItem("PROCESSO_RELATORIO");
+
+        if(that.isNotEmpty(historico)) {
+            historico = JSON.parse(historico);
+            historico.concat(registros);
+        } 
+        else {
+            historico = registros;
+        }
+
+        historico = JSON.stringify(historico);
+        localStorage.setItem("PROCESSO_RELATORIO", historico);
+        that.fnAtivarOuDesativarRelatorio();
+    },
+
+    fnBaixarRelatorio: function(htmlElement, event) {
+        let historico = localStorage.getItem("PROCESSO_RELATORIO");
+
+        if(this.isEmpty(historico) && historico == "[]") {
+            FLUIGC.toast({
+                title: 'Alerta: ',
+                message: `Não existem registros no relatório!`,
+                type: 'warning'
+            });
+            return;
+        }
+
+        historico = JSON.parse(historico);
+        
+        const colunas = [
+            {
+                'name': 'processInstanceId', 
+                'title': 'SOLICITACAO'
+            },
+            {
+                'name': 'status', 
+                'title': 'STATUS'
+            },
+            {
+                'name': 'message', 
+                'title': 'MENSAGEM'
+            },
+            {
+                'name': 'tenantId', 
+                'title': 'CODIGO DO USUARIO'
+            },
+            {
+                'name': 'errorCode', 
+                'title': 'CODIGO DO ERRO'
+            }
+        ];
+
+        pubcore({
+            cols: colunas,
+            rows: historico,
+            filename: 'relatório_de_solicitacoes_canceladas.xlsx'
+        });
+    },
+
+    fnAtivarOuDesativarRelatorio: function () {
+        const historico = localStorage.getItem("PROCESSO_RELATORIO");
+        const acao = `#btn_baixar_relatorio_${this.instanceId}`;
+
+        if(this.isNotEmpty(historico) && historico != "[]") {
+            $(acao).show();
+        } 
+        else {
+            $(acao).hide();
+        }
     },
 
     fnExcluirRegistros: function(htmlElement, event) {
